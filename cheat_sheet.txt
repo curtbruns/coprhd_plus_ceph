@@ -2,6 +2,9 @@
 CEPH + CoprHD CheatSheet:
 ++++ Login to the CoprHD Node:
 `vagrant ssh coprhd -- -l storageos`  # P: vagrant
+Set these variables:
+`export COPRHD_HOST=192.168.100.11`
+`export VIPR_HOSTNAME=${COPRHD_HOST}`
 
 # 0) Get Ceph Admin Key:
 ssh 192.168.100.100 -l vagrant "cat /etc/ceph/ceph.client.admin.keyring"
@@ -57,6 +60,7 @@ rbd ls -l # Watch volumes come in and out
 After steps above, should see this volume:
 NAME                                          SIZE PARENT FMT PROT LOCK
 CephVol:d756117b-7d6d-4cca-9868-4e1cad8210cd 1024M          2
+(Uniaue ID will be different, but first part 'CephVol' will be same)
 
 ++++ Back on the CoprHD Node:
 # 13) Delete Ceph Volume:
