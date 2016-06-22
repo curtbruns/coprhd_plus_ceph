@@ -1,0 +1,64 @@
+=====
+CEPH + CoprHD CheatSheet:
+++++ Login to the CoprHD Node:
+`vagrant ssh coprhd -- -l storageos`  # P: vagrant
+
+# 0) Get Ceph Admin Key:
+ssh 192.168.100.100 -l vagrant "cat /etc/ceph/ceph.client.admin.keyring"
+P: vagrant
+
+# 1) Authenticate
+/opt/storageos/cli/bin/viprcli authenticate -u root -d /tmp
+P should be: "ChangeMe" unless you've changed it through CoprHD Portal
+
+# 2) Add Ceph as Storage Provider
+/opt/storageos/cli/bin/viprcli storageprovider create -n CEPH -provip 192.168.100.100 -provport 22 -u admin -if ceph
+[ Use Key from Step 0 as password ]
+
+# 3) Verify Ceph StorageSystem exists
+/opt/storageos/cli/bin/viprcli storagesystem list
+
+# 4) Add IP Network for Ceph
+/opt/storageos/cli/bin/viprcli network create -n CephIP -t IP
+
+# 5) Add Virtual Array
+/opt/storageos/cli/bin/viprcli varray create -n myVarray1
+
+# 6) Add Virtual Array to Network
+/opt/storageos/cli/bin/viprcli network update -varray_add myVarray1 -n CephIP
+
+# 7) Get Ceph System ID
+/opt/storageos/cli/bin/viprcli storagesystem list
+[Copy the "Name" Field to be used as CEPH_ID]
+
+# 8) Check Ceph's Storage Port
+/opt/storageos/cli/bin/viprcli storageport list -t ceph -storagesystem [CEPH_ID]
+[Get the PORT_NETWORK_ID field for the CEPH_Storage_Port_ID]
+
+# 9) Add Storage Port to Network
+/opt/storageos/cli/bin/viprcli network update -n CephIP -endpoint_add [CEPH_Storage_Port_ID]
+
+# 10) Create a Block Vpool and attach to Ceph VA
+/opt/storageos/cli/bin/viprcli vpool create -systemtype ceph -type block -n ThinCeph -protocol RBD -va myVarray1 -pt Thin -desc CephVP
+
+# 11) Create a Project
+/opt/storageos/cli/bin/viprcli project create -n CephProj
+
+# 12) Create a Ceph Volume:
+/opt/storageos/cli/bin/viprcli volume create -n CephVol -size 1G -pr CephProj -vpool ThinCeph -va myVarray1
+
+++++ From your Vagrant/Virtualbox host, go to the Ceph Node 
+`vagrant ssh mon`
+# Check Ceph is running
+ceph status
+# Confirm Volume is created in Ceph
+rbd ls -l # Watch volumes come in and out
+
+After steps above, should see this volume:
+NAME                                          SIZE PARENT FMT PROT LOCK
+CephVol:d756117b-7d6d-4cca-9868-4e1cad8210cd 1024M          2
+
+++++ Back on the CoprHD Node:
+# 13) Delete Ceph Volume:
+/opt/storageos/cli/bin/viprcli volume delete -n CephVol -pr "CephProj"
+
