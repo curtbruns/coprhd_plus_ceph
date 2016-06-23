@@ -67,7 +67,7 @@ P should be: "ChangeMe" unless you've changed it through CoprHD Portal
 /opt/storageos/cli/bin/viprcli initiator list -hl Rhel
 
 # 18) Add Host Initiator to the ExportGroup:
-/opt/storageos/cli/bin/viprcli exportgroup add_initiator -name 192.168.100.72 -in [INITIATOR_PORT from previous command]-hl Rhel -pr CephProj
+/opt/storageos/cli/bin/viprcli exportgroup add_initiator -name 192.168.100.72 -in [INITIATOR_PORT from previous command] -hl Rhel -pr CephProj
 
 # 19) Add Created Volume to Export Group:
 /opt/storageos/cli/bin/viprcli exportgroup add_vol -n 192.168.100.72 -volume CephVol -pr CephProj
