@@ -5,6 +5,11 @@ mkdir cluster
 cd cluster
 ceph-deploy new mon
 echo "osd pool default size = 2" >> ceph.conf
+# If using ext4 for filesystem:
+echo "osd max object name len = 256" >> ceph.conf
+echo "osd max object namespace len = 64" >> ceph.conf
+
+
 
 ceph-deploy install admin mon osd1 osd2
 ceph-deploy mon create-initial  
