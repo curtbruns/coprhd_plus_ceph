@@ -36,18 +36,18 @@ end
 # CoprHD Settings
 #
 ########################################################
-ch_node_ip = "#{network}.11"
-ch_virtual_ip = "#{network}.10"
-ch_gw_ip = "#{network}.1"
-build = true
-ch_vagrantbox = "3.5.0.0.30_CoprHDBox"
-ch_vagrantboxurl = "https://build.coprhd.org/jenkins/userContent/DevKits/3.5.0.0.30/CoprHDDevKit.x86_64-3.5.0.0.30.box"
+#ch_node_ip = "#{network}.11"
+#ch_virtual_ip = "#{network}.10"
+#ch_gw_ip = "#{network}.1"
+#build = true
+#ch_vagrantbox = "3.5.0.0.30_CoprHDBox"
+#ch_vagrantboxurl = "https://build.coprhd.org/jenkins/userContent/DevKits/3.5.0.0.30/CoprHDDevKit.x86_64-3.5.0.0.30.box"
 
 # Simulated Backend - set to true to get VNX/VMAX Simulated Backends
-smis_simulator = false
+#smis_simulator = false
 
 # All Simulators - set to true for Sanity Testing (will include smis_simulator)
-all_simulators = false
+#all_simulators = false
 
 ########################################################
 #
@@ -59,8 +59,12 @@ mon_node_ip   = "#{network}.100"
 osd1_node_ip  = "#{network}.101"
 osd2_node_ip  = "#{network}.102"
 
-# Ubuntu 14.04 Server Base
+# Ubuntu 16.04 Server Base
+#ceph_vagrantbox = "boxcutter/ubuntu1604"
 ceph_vagrantbox = "ubuntu/trusty64"
+#ceph_vagrantboxurl = "https://atlas.hashicorp.com/boxcutter/boxes/ubuntu1604/versions/2.0.23/providers/virtualbox.box"
+#ceph_vagrantbox = "bento_xenial"
+#ceph_vagrantboxurl = "https://atlas.hashicorp.com/bento/boxes/ubuntu-16.04/versions/2.3.0/providers/virtualbox.box"
 
 # Ceph Nodes - in order we want them to boot
 ceph_nodes = ['mon', 'osd1', 'osd2', 'admin']
@@ -78,6 +82,8 @@ ceph_nodes.each { |node_name|
 #
 ########################################################
 Vagrant.configure("2") do |config|
+
+  config.vm.box_download_insecure = true
 
   # If Proxy is set when provisioning, we set it permanently in each VM
   # If Proxy is not set when provisioning, we won't set it
@@ -98,73 +104,78 @@ Vagrant.configure("2") do |config|
 
   # Enable caching to speed up package installation for second run
   # vagrant plugin install vagrant-cachier
-  if Vagrant.has_plugin?("vagrant-cachier")
-    config.cache.scope = :box
-  end
+#  if Vagrant.has_plugin?("vagrant-cachier")
+#    config.cache.scope = :box
+#    config.cache.synced_folder_opts = {
+#        owner: "_apt",
+#        group: "_apt"
+#    }
+#  end
 
 ########################################################
 #
 # Launch CoprHD
 #
 ########################################################
-  config.vm.define "coprhd" do |coprhd|
-     coprhd.vm.box = "#{ch_vagrantbox}"
-     coprhd.vm.box_url = "#{ch_vagrantboxurl}"
-     coprhd.vm.host_name = "coprhd1"
-     coprhd.vm.network "private_network", ip: "#{ch_node_ip}"
-     coprhd.vm.base_mac = "003EDAF3880D"
-
-     # configure virtualbox provider
-     coprhd.vm.provider "virtualbox" do |v|
-         v.gui = false
-         v.name = "CoprHD_Ceph"
-         v.memory = 3000
-         v.cpus = 4
-     end
-
-     # download and compile CoprHD from sources
-     coprhd.vm.provision "shell" do |s|
-      s.path = "scripts/build.sh"
-      s.args = "--build #{build} --node_ip #{ch_node_ip} --virtual_ip #{ch_virtual_ip} --gw_ip #{ch_gw_ip} --node_count 1 --node_id vipr1"
-      s.args  += script_proxy_args
-     end
-
-      # Setup ntpdate crontab
-      coprhd.vm.provision "shell", inline: "zypper -n install cron"
-      coprhd.vm.provision "shell" do |s|
-        s.path = "scripts/crontab.sh"
-        s.privileged = false
-      end
-
-     # install CoprHD RPM
-     coprhd.vm.provision "shell" do |s|
-      s.path = "scripts/install.sh"
-      s.args   = "--virtual_ip #{ch_virtual_ip}"
-     end
-
-     # Grab CoprHD CLI Scripts and Patch Auth Module
-     coprhd.vm.provision "shell" do |s|
-      s.path = "scripts/coprhd_cli.sh"
-      s.args = "-s #{smis_simulator} -a #{all_simulators} --node_ip #{ch_node_ip}"
-     end
-
-     coprhd.vm.provision "shell" do |s|
-      s.path = "scripts/banner.sh"
-      s.args   = "--virtual_ip #{ch_virtual_ip}"
-     end
-
-     coprhd.vm.provision "shell", inline: "service network restart", run: "always"
-     coprhd.vm.provision "shell", inline: "service sshd restart", run: "always"
-    end # End of CoprHD Config
-
-########################################################
+#  config.vm.define "coprhd" do |coprhd|
+#     coprhd.vm.box = "#{ch_vagrantbox}"
+#     coprhd.vm.box_url = "#{ch_vagrantboxurl}"
+#     coprhd.vm.host_name = "coprhd1"
+#     coprhd.vm.network "private_network", ip: "#{ch_node_ip}"
+#     coprhd.vm.base_mac = "003EDAF3880D"
+#
+#     # configure virtualbox provider
+#     coprhd.vm.provider "virtualbox" do |v|
+#         v.gui = false
+#         v.name = "CoprHD_Ceph"
+#         v.memory = 3000
+#         v.cpus = 4
+#     end
+#
+#     # download and compile CoprHD from sources
+#     coprhd.vm.provision "shell" do |s|
+#      s.path = "scripts/build.sh"
+#      s.args = "--build #{build} --node_ip #{ch_node_ip} --virtual_ip #{ch_virtual_ip} --gw_ip #{ch_gw_ip} --node_count 1 --node_id vipr1"
+#      s.args  += script_proxy_args
+#     end
+#
+#      # Setup ntpdate crontab
+#      coprhd.vm.provision "shell", inline: "zypper -n install cron"
+#      coprhd.vm.provision "shell" do |s|
+#        s.path = "scripts/crontab.sh"
+#        s.privileged = false
+#      end
+#
+#     # install CoprHD RPM
+#     coprhd.vm.provision "shell" do |s|
+#      s.path = "scripts/install.sh"
+#      s.args   = "--virtual_ip #{ch_virtual_ip}"
+#     end
+#
+#     # Grab CoprHD CLI Scripts and Patch Auth Module
+#     coprhd.vm.provision "shell" do |s|
+#      s.path = "scripts/coprhd_cli.sh"
+#      s.args = "-s #{smis_simulator} -a #{all_simulators} --node_ip #{ch_node_ip}"
+#     end
+#
+#     coprhd.vm.provision "shell" do |s|
+#      s.path = "scripts/banner.sh"
+#      s.args   = "--virtual_ip #{ch_virtual_ip}"
+#     end
+#
+#     coprhd.vm.provision "shell", inline: "service network restart", run: "always"
+#     coprhd.vm.provision "shell", inline: "service sshd restart", run: "always"
+#    end # End of CoprHD Config
+#
+#########################################################
 #
 # Launch CEPH Cluster
 #
 ########################################################
   ceph_hostnames.each do |node|
     config.vm.define node[:hostname] do |node_config|
-      node_config.vm.box = "#{ceph_vagrantbox}"
+      node_config.vm.box = "#{ceph_vagrantbox}" 
+#      node_config.vm.box_url = "#{ceph_vagrantboxurl}"
       node_config.vm.host_name = "#{node[:hostname]}.#{domain}"
       node_config.vm.provider :virtualbox do |vb|
         vb.customize ["modifyvm", :id, "--memory", "1024"]

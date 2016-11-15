@@ -82,7 +82,7 @@ rbd ls -l # Watch volumes come in and out
 After steps above, should see this volume:
 NAME                                          SIZE PARENT FMT PROT LOCK
 CephVol:d756117b-7d6d-4cca-9868-4e1cad8210cd 1024M          2
-(Uniaue ID will be different, but first part 'CephVol' will be same)
+(Unique ID will be different, but first part 'CephVol' will be same)
 
 ++++ To Remove Export and Volume:
 ++++ Back on the CoprHD Node:

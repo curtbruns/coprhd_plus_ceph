@@ -17,6 +17,9 @@ ceph-deploy mon create-initial
 ssh osd1 "sudo mkdir /var/local/osd0"
 ssh osd2 "sudo mkdir /var/local/osd1"
 
+ssh osd1 "sudo chown -R ceph:ceph /var/local/osd0"
+ssh osd2 "sudo chown -R ceph:ceph /var/local/osd1"
+
 ceph-deploy osd prepare osd1:/var/local/osd0 osd2:/var/local/osd1
 ceph-deploy osd activate osd1:/var/local/osd0 osd2:/var/local/osd1
 
