@@ -60,8 +60,9 @@ osd1_node_ip  = "#{network}.101"
 osd2_node_ip  = "#{network}.102"
 
 # Ubuntu 16.04 Server Base
-#ceph_vagrantbox = "boxcutter/ubuntu1604"
-ceph_vagrantbox = "ubuntu/trusty64"
+ceph_vagrantbox = "boxcutter/ubuntu1604"
+# Stupid Ubuntu Xenial box doesn't have the vagrant user!
+#ceph_vagrantbox = "ubuntu/xenial64"
 #ceph_vagrantboxurl = "https://atlas.hashicorp.com/boxcutter/boxes/ubuntu1604/versions/2.0.23/providers/virtualbox.box"
 #ceph_vagrantbox = "bento_xenial"
 #ceph_vagrantboxurl = "https://atlas.hashicorp.com/bento/boxes/ubuntu-16.04/versions/2.3.0/providers/virtualbox.box"
